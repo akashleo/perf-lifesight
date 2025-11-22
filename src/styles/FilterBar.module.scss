@@ -44,56 +44,21 @@
     gap: $spacing-lg;
   }
 
-  .filterSection {
-    h3 {
-      font-size: $text-sm;
-      font-weight: $font-medium;
-      color: $gray-700;
-      margin: 0 0 $spacing-md 0;
+  .searchSection {
+    width: 100%;
+  }
+
+  .filtersRow {
+    display: flex;
+    gap: $spacing-lg;
+    
+    @media (max-width: $breakpoint-md) {
+      flex-direction: column;
+      gap: $spacing-md;
     }
-
-    .filterButtons {
-      display: flex;
-      flex-wrap: wrap;
-      gap: $spacing-sm;
-
-      button {
-        padding: $spacing-xs $spacing-md;
-        border-radius: $radius-full;
-        font-size: $text-sm;
-        font-weight: $font-medium;
-        border: none;
-        cursor: pointer;
-        transition: all $transition-fast;
-
-        &.channelButton {
-          background-color: $gray-100;
-          color: $gray-700;
-
-          &:hover {
-            background-color: $gray-200;
-          }
-
-          &.active {
-            background-color: $primary-color;
-            color: $white;
-          }
-        }
-
-        &.regionButton {
-          background-color: $gray-100;
-          color: $gray-700;
-
-          &:hover {
-            background-color: $gray-200;
-          }
-
-          &.active {
-            background-color: #059669;
-            color: $white;
-          }
-        }
-      }
+    
+    > div {
+      flex: 1;
     }
   }
 }

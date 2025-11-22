@@ -8,13 +8,14 @@ import {
   selectUniqueRegions,
 } from '../../store/slices/marketingSlice';
 import { SearchInput } from './SearchInput';
+import { MultiSelectDropdown } from './MultiSelectDropdown';
 import styles from '../../styles/FilterBar.module.scss';
 
 export const FilterBar: React.FC = () => {
   const dispatch = useAppDispatch();
   const filters = useAppSelector(selectFilters);
-  const channels = useAppSelector(selectUniqueChannels);
-  const regions = useAppSelector(selectUniqueRegions);
+  const channels = useAppSelector(selectUniqueChannels) as string[];
+  const regions = useAppSelector(selectUniqueRegions) as string[];
 
   const handleChannelChange = useCallback(
     (channel: string) => {
@@ -58,43 +59,24 @@ export const FilterBar: React.FC = () => {
       </div>
 
       <div className={styles.filterContent}>
-        {/* Search */}
-        <SearchInput />
-
-        {/* Channels */}
-        <div className={styles.filterSection}>
-          <h3>Channels</h3>
-          <div className={styles.filterButtons}>
-            {channels.map((channel) => (
-              <button
-                key={channel}
-                onClick={() => handleChannelChange(channel)}
-                className={`${styles.channelButton} ${
-                  filters.channels.includes(channel) ? styles.active : ''
-                }`}
-              >
-                {channel}
-              </button>
-            ))}
-          </div>
+        <div className={styles.searchSection}>
+          <SearchInput />
         </div>
-
-        {/* Regions */}
-        <div className={styles.filterSection}>
-          <h3>Regions</h3>
-          <div className={styles.filterButtons}>
-            {regions.map((region) => (
-              <button
-                key={region}
-                onClick={() => handleRegionChange(region)}
-                className={`${styles.regionButton} ${
-                  filters.regions.includes(region) ? styles.active : ''
-                }`}
-              >
-                {region}
-              </button>
-            ))}
-          </div>
+        
+        <div className={styles.filtersRow}>
+          <MultiSelectDropdown
+            label="Channels"
+            options={channels}
+            selected={filters.channels}
+            onChange={handleChannelChange}
+          />
+          
+          <MultiSelectDropdown
+            label="Regions"
+            options={regions}
+            selected={filters.regions}
+            onChange={handleRegionChange}
+          />
         </div>
       </div>
     </div>

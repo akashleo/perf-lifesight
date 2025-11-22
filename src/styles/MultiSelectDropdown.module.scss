@@ -1,0 +1,125 @@
+@import 'variables.scss';
+
+.dropdown {
+  position: relative;
+  min-width: 200px;
+}
+
+.dropdownTrigger {
+  width: 100%;
+  padding: $spacing-sm $spacing-md;
+  background-color: $white;
+  border: 1px solid $gray-300;
+  border-radius: $radius-md;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  font-size: $text-sm;
+  color: $gray-700;
+  transition: border-color $transition-fast;
+
+  &:hover {
+    border-color: $gray-400;
+  }
+
+  &:focus {
+    outline: none;
+    border-color: $primary-color;
+    box-shadow: 0 0 0 2px rgba($primary-color, 0.1);
+  }
+}
+
+.badge {
+  background-color: $primary-color;
+  color: $white;
+  font-size: $text-xs;
+  padding: 2px 6px;
+  border-radius: $radius-full;
+  margin-left: $spacing-sm;
+}
+
+.chevron {
+  width: 16px;
+  height: 16px;
+  color: $gray-500;
+  transition: transform $transition-fast;
+
+  &.open {
+    transform: rotate(180deg);
+  }
+}
+
+.dropdownMenu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  max-height: 300px;
+  overflow-y: auto;
+  background-color: $white;
+  border: 1px solid $gray-200;
+  border-radius: $radius-md;
+  box-shadow: $shadow-lg;
+  margin-top: $spacing-xs;
+  z-index: 50;
+  animation: slideDown 0.2s ease-out;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  padding: $spacing-sm $spacing-md;
+  cursor: pointer;
+  transition: background-color $transition-fast;
+  font-size: $text-sm;
+  color: $gray-700;
+
+  &:hover {
+    background-color: $gray-50;
+  }
+
+  &.selected {
+    background-color: #eff6ff;
+    color: $primary-color;
+    font-weight: $font-medium;
+  }
+}
+
+.checkbox {
+  margin-right: $spacing-md;
+  width: 16px;
+  height: 16px;
+  border: 1px solid $gray-300;
+  border-radius: $radius-sm;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all $transition-fast;
+
+  &.checked {
+    background-color: $primary-color;
+    border-color: $primary-color;
+    
+    &::after {
+      content: '';
+      width: 4px;
+      height: 8px;
+      border: solid white;
+      border-width: 0 2px 2px 0;
+      transform: rotate(45deg);
+      margin-bottom: 2px;
+    }
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

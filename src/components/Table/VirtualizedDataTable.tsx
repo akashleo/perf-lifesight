@@ -1,7 +1,5 @@
-import React, { useMemo, useCallback } from 'react';
+import React, { useMemo, useCallback, useState, useRef, useEffect } from 'react';
 import { FixedSizeList as List } from 'react-window';
-import { useAppDispatch, useAppSelector } from '../../store/hooks';
-import { setSorting, selectSorting } from '../../store/slices/marketingSlice';
 import type { MarketingRecord } from '../../types/marketing.types';
 import { formatCurrency, formatNumber, calculateCTR, calculateCPA } from '../../utils/calculations';
 import { Pagination } from './Pagination';
@@ -11,178 +9,285 @@ interface DataTableProps {
   data: MarketingRecord[];
 }
 
+interface GroupedData {
+  region: string;
+  channels: MarketingRecord[];
+  totals: {
+    spend: number;
+    impressions: number;
+    clicks: number;
+    conversions: number;
+    ctr: number;
+    cpa: number;
+  };
+}
+
+interface TreeItem {
+  type: 'region' | 'channel';
+  region: string;
+  data?: MarketingRecord;
+  totals?: GroupedData['totals'];
+  isExpanded?: boolean;
+  level: number;
+  isLastChild?: boolean;
+}
+
 interface RowProps {
   index: number;
   style: React.CSSProperties;
   data: {
-    items: MarketingRecord[];
-    columns: Column[];
+    items: TreeItem[];
+    onToggleExpand: (region: string) => void;
   };
 }
 
 interface Column {
-  key: keyof MarketingRecord | 'ctr' | 'cpa';
+  key: string;
   header: string;
-  width: number;
-  render?: (record: MarketingRecord) => React.ReactNode;
+  width: string;
 }
 
 const Row: React.FC<RowProps> = ({ index, style, data }) => {
-  const record = data.items[index];
+  const item = data.items[index];
+  const isRegion = item.type === 'region';
   
-  return (
-    <div style={style} className={styles.virtualRow}>
-      {data.columns.map((column) => (
-        <div 
-          key={column.key} 
-          className={styles.virtualCell}
-          style={{ width: column.width }}
-        >
-          {column.render ? column.render(record) : record[column.key as keyof MarketingRecord]}
+  const handleToggle = () => {
+    if (isRegion) {
+      data.onToggleExpand(item.region);
+    }
+  };
+
+  if (isRegion) {
+    // Region row (parent)
+    return (
+      <div 
+        style={style} 
+        className={`${styles.virtualRow} ${styles.regionRow}`}
+        onClick={handleToggle}
+      >
+        <div className={styles.virtualCell} style={{ flex: '1 1 300px' }}>
+          <div className={styles.regionHeader}>
+            <svg 
+              className={`${styles.expandIcon} ${item.isExpanded ? styles.expanded : ''}`}
+              width="12" 
+              height="12" 
+              viewBox="0 0 12 12" 
+              fill="none" 
+              stroke="currentColor"
+            >
+              <path d="M3 4.5l3 3 3-3" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+            <span className={styles.regionName}>{item.region}</span>
+          </div>
         </div>
-      ))}
-    </div>
-  );
+        <div className={styles.virtualCell} style={{ flex: '0 0 140px' }}>
+          {formatCurrency(item.totals?.spend || 0)}
+        </div>
+        <div className={styles.virtualCell} style={{ flex: '0 0 140px' }}>
+          {formatNumber(item.totals?.impressions || 0)}
+        </div>
+        <div className={styles.virtualCell} style={{ flex: '0 0 120px' }}>
+          {formatNumber(item.totals?.clicks || 0)}
+        </div>
+        <div className={styles.virtualCell} style={{ flex: '0 0 140px' }}>
+          {formatNumber(item.totals?.conversions || 0)}
+        </div>
+        <div className={styles.virtualCell} style={{ flex: '0 0 100px' }}>
+          {(item.totals?.ctr || 0).toFixed(2)}%
+        </div>
+        <div className={styles.virtualCell} style={{ flex: '0 0 120px' }}>
+          {formatCurrency(item.totals?.cpa || 0)}
+        </div>
+      </div>
+    );
+  } else {
+    // Channel row (child)
+    const record = item.data!;
+    return (
+      <div style={style} className={`${styles.virtualRow} ${styles.channelRow}`}>
+        <div className={styles.virtualCell} style={{ flex: '1 1 300px' }}>
+          <div className={styles.channelHeader}>
+            <div className={styles.treeLines}>
+              <div className={styles.verticalLine}></div>
+              <div className={styles.horizontalLine}></div>
+              {item.isLastChild && <div className={styles.cornerLine}></div>}
+            </div>
+            <span className={styles.channelName}>{record.channel}</span>
+          </div>
+        </div>
+        <div className={styles.virtualCell} style={{ flex: '0 0 140px' }}>
+          {formatCurrency(record.spend)}
+        </div>
+        <div className={styles.virtualCell} style={{ flex: '0 0 140px' }}>
+          {formatNumber(record.impressions)}
+        </div>
+        <div className={styles.virtualCell} style={{ flex: '0 0 120px' }}>
+          {formatNumber(record.clicks)}
+        </div>
+        <div className={styles.virtualCell} style={{ flex: '0 0 140px' }}>
+          {formatNumber(record.conversions)}
+        </div>
+        <div className={styles.virtualCell} style={{ flex: '0 0 100px' }}>
+          {calculateCTR(record.clicks, record.impressions).toFixed(2)}%
+        </div>
+        <div className={styles.virtualCell} style={{ flex: '0 0 120px' }}>
+          {formatCurrency(calculateCPA(record.spend, record.conversions))}
+        </div>
+      </div>
+    );
+  }
 };
 
 export const VirtualizedDataTable: React.FC<DataTableProps> = ({ data }) => {
-  const dispatch = useAppDispatch();
-  const sorting = useAppSelector(selectSorting);
+  const [expandedRegions, setExpandedRegions] = useState<Set<string>>(new Set());
+  const [containerWidth, setContainerWidth] = useState<number>(0);
+  const containerRef = useRef<HTMLDivElement>(null);
 
-  const handleSort = useCallback(
-    (field: keyof MarketingRecord) => {
-      if (sorting.field === field) {
-        dispatch(
-          setSorting({
-            field,
-            direction: sorting.direction === 'asc' ? 'desc' : 'asc',
-          })
-        );
-      } else {
-        dispatch(setSorting({ field, direction: 'asc' }));
+  // Update container width on mount and resize
+  useEffect(() => {
+    const updateWidth = () => {
+      if (containerRef.current) {
+        setContainerWidth(containerRef.current.offsetWidth);
       }
-    },
-    [dispatch, sorting]
-  );
+    };
+
+    updateWidth();
+    window.addEventListener('resize', updateWidth);
+    return () => window.removeEventListener('resize', updateWidth);
+  }, []);
+
+  // Group data by region
+  const groupedData = useMemo(() => {
+    const groups = new Map<string, MarketingRecord[]>();
+    
+    data.forEach(record => {
+      if (!groups.has(record.region)) {
+        groups.set(record.region, []);
+      }
+      groups.get(record.region)!.push(record);
+    });
+
+    return Array.from(groups.entries()).map(([region, channels]) => {
+      // Calculate totals for the region
+      const totals = channels.reduce(
+        (acc, record) => ({
+          spend: acc.spend + record.spend,
+          impressions: acc.impressions + record.impressions,
+          clicks: acc.clicks + record.clicks,
+          conversions: acc.conversions + record.conversions,
+          ctr: 0, // Will calculate after
+          cpa: 0, // Will calculate after
+        }),
+        { spend: 0, impressions: 0, clicks: 0, conversions: 0, ctr: 0, cpa: 0 }
+      );
+
+      // Calculate derived metrics
+      totals.ctr = calculateCTR(totals.clicks, totals.impressions);
+      totals.cpa = calculateCPA(totals.spend, totals.conversions);
+
+      return {
+        region,
+        channels,
+        totals,
+      };
+    });
+  }, [data]);
+
+  // Create flat tree structure for virtualization
+  const treeItems = useMemo(() => {
+    const items: TreeItem[] = [];
+    
+    groupedData.forEach(group => {
+      const isExpanded = expandedRegions.has(group.region);
+      
+      // Add region row
+      items.push({
+        type: 'region',
+        region: group.region,
+        totals: group.totals,
+        isExpanded,
+        level: 0,
+      });
+
+      // Add channel rows if expanded
+      if (isExpanded) {
+        group.channels.forEach((channel, index) => {
+          items.push({
+            type: 'channel',
+            region: group.region,
+            data: channel,
+            level: 1,
+            isLastChild: index === group.channels.length - 1,
+          });
+        });
+      }
+    });
+
+    return items;
+  }, [groupedData, expandedRegions]);
+
+  const handleToggleExpand = useCallback((region: string) => {
+    setExpandedRegions(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(region)) {
+        newSet.delete(region);
+      } else {
+        newSet.add(region);
+      }
+      return newSet;
+    });
+  }, []);
 
   const columns: Column[] = useMemo(
     () => [
-      { key: 'id', header: 'ID', width: 80 },
-      { 
-        key: 'channel', 
-        header: 'Channel', 
-        width: 120,
-        render: (record) => <span className={styles.channelCell}>{record.channel}</span>
-      },
-      { key: 'region', header: 'Region', width: 140 },
-      { 
-        key: 'spend', 
-        header: 'Spend', 
-        width: 120,
-        render: (record) => (
-          <span className={styles.spendCell}>{formatCurrency(record.spend)}</span>
-        )
-      },
-      { 
-        key: 'impressions', 
-        header: 'Impressions', 
-        width: 120,
-        render: (record) => formatNumber(record.impressions)
-      },
-      { 
-        key: 'clicks', 
-        header: 'Clicks', 
-        width: 100,
-        render: (record) => formatNumber(record.clicks)
-      },
-      { 
-        key: 'conversions', 
-        header: 'Conversions', 
-        width: 120,
-        render: (record) => (
-          <span className={styles.conversionsCell}>{formatNumber(record.conversions)}</span>
-        )
-      },
-      { 
-        key: 'ctr', 
-        header: 'CTR', 
-        width: 100,
-        render: (record) => {
-          const ctr = calculateCTR(record.clicks, record.impressions);
-          return <span className={styles.ctrCell}>{ctr.toFixed(2)}%</span>;
-        }
-      },
-      { 
-        key: 'cpa', 
-        header: 'CPA', 
-        width: 100,
-        render: (record) => {
-          const cpa = calculateCPA(record.spend, record.conversions);
-          return <span className={styles.cpaCell}>{formatCurrency(cpa)}</span>;
-        }
-      },
+      { key: 'region', header: 'Region / Channel', width: '' },
+      { key: 'spend', header: 'Spend', width: '' },
+      { key: 'impressions', header: 'Impressions', width: '' },
+      { key: 'clicks', header: 'Clicks', width: '' },
+      { key: 'conversions', header: 'Conversions', width: '' },
+      { key: 'ctr', header: 'CTR', width: '' },
+      { key: 'cpa', header: 'CPA', width: '' },
     ],
     []
   );
 
-  const getSortIcon = (field: keyof MarketingRecord) => {
-    if (sorting.field !== field) {
-      return (
-        <svg className={styles.sortIcon} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
-        </svg>
-      );
-    }
-    return sorting.direction === 'asc' ? (
-      <svg className={styles.sortIconActive} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
-      </svg>
-    ) : (
-      <svg className={styles.sortIconActive} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-      </svg>
-    );
-  };
-
   const itemData = useMemo(
     () => ({
-      items: data,
-      columns,
+      items: treeItems,
+      onToggleExpand: handleToggleExpand,
     }),
-    [data, columns]
+    [treeItems, handleToggleExpand]
   );
 
-  const totalWidth = columns.reduce((sum, col) => sum + col.width, 0);
-
   return (
-    <div className={styles.tableContainer}>
+    <div className={styles.tableContainer} ref={containerRef}>
       <div className={styles.virtualTableWrapper}>
         {/* Header */}
-        <div className={styles.virtualHeader} style={{ width: totalWidth }}>
-          {columns.map((column) => {
-            const canSort = column.key !== 'ctr' && column.key !== 'cpa';
-            return (
-              <div
-                key={column.key}
-                className={`${styles.virtualHeaderCell} ${canSort ? styles.sortable : ''}`}
-                style={{ width: column.width }}
-                onClick={() => canSort && handleSort(column.key as keyof MarketingRecord)}
-              >
-                <div className={styles.headerContent}>
-                  {column.header}
-                  {canSort && getSortIcon(column.key as keyof MarketingRecord)}
-                </div>
+        <div className={styles.virtualHeader}>
+          {columns.map((column) => (
+            <div
+              key={column.key}
+              className={styles.virtualHeaderCell}
+              style={{ 
+                flex: column.key === 'region' ? '1 1 300px' : 
+                      column.key === 'clicks' || column.key === 'ctr' ? '0 0 100px' :
+                      column.key === 'impressions' || column.key === 'conversions' ? '0 0 140px' :
+                      '0 0 120px'
+              }}
+            >
+              <div className={styles.headerContent}>
+                {column.header}
               </div>
-            );
-          })}
+            </div>
+          ))}
         </div>
 
         {/* Virtualized Body */}
         <List
           height={500}
-          itemCount={data.length}
+          itemCount={treeItems.length}
           itemSize={50}
-          width={totalWidth}
+          width={containerWidth || '100%'}
           itemData={itemData}
         >
           {Row}

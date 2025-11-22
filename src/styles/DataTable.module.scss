@@ -108,33 +108,38 @@
 .virtualTableWrapper {
   overflow: hidden;
   border-radius: $radius-lg $radius-lg 0 0;
+  width: 100%;
 }
 
 .virtualHeader {
   display: flex;
-  background-color: $gray-50;
-  border-bottom: 1px solid $gray-200;
+  background: linear-gradient(to bottom, #ffffff, #f8f9fa);
+  border-bottom: 2px solid #e5e7eb;
+  font-weight: $font-semibold;
   position: sticky;
   top: 0;
   z-index: 10;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  width: 100%;
 }
 
 .virtualHeaderCell {
-  padding: $spacing-md $spacing-lg;
-  font-size: $text-xs;
-  font-weight: $font-medium;
-  color: $gray-500;
+  padding: $spacing-md;
+  text-align: left;
+  color: #374151;
+  border-right: 1px solid #e5e7eb;
+  cursor: default;
+  user-select: none;
+  font-size: 12px;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  display: flex;
-  align-items: center;
-  border-right: 1px solid $gray-200;
-
+  letter-spacing: 0.5px;
+  
   &:last-child {
     border-right: none;
   }
-
-  &.sortable {
+  
+  &:first-child {
+    padding-left: $spacing-md;
     cursor: pointer;
     user-select: none;
 
@@ -157,6 +162,7 @@
   border-bottom: 1px solid $gray-200;
   background-color: $white;
   transition: background-color $transition-fast;
+  width: 100%;
 
   &:hover {
     background-color: $gray-50;
@@ -165,14 +171,138 @@
 
 .virtualCell {
   padding: $spacing-md $spacing-lg;
-  font-size: $text-sm;
-  color: $gray-700;
-  border-right: 1px solid $gray-100;
+  font-size: 13px;
+  color: #4b5563;
+  border-right: 1px solid #f3f4f6;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  display: flex;
+  align-items: center;
 
   &:last-child {
     border-right: none;
   }
+  
+  // Numeric columns styling
+  &:nth-child(2),  // Spend
+  &:nth-child(3),  // Impressions
+  &:nth-child(4),  // Clicks
+  &:nth-child(5),  // Conversions
+  &:nth-child(6),  // CTR
+  &:nth-child(7) { // CPA
+    text-align: right;
+    justify-content: flex-end;
+    font-variant-numeric: tabular-nums;
+  }
+  
+  // Special coloring for metrics
+  &:nth-child(2) { // Spend
+    color: #059669;
+    font-weight: 500;
+  }
+  
+  &:nth-child(6) { // CTR
+    color: #7c3aed;
+  }
+  
+  &:nth-child(7) { // CPA
+    color: #dc2626;
+  }
+}
+
+// Tree table styles
+.regionRow {
+  background-color: #f8f9fa;
+  font-weight: $font-semibold;
+  cursor: pointer;
+  border-bottom: 1px solid $gray-200;
+  
+  &:hover {
+    background-color: #e9ecef;
+  }
+}
+
+.channelRow {
+  background-color: $white;
+  border-bottom: 1px solid $gray-100;
+  
+  &:hover {
+    background-color: #f8f9fa;
+  }
+}
+
+.regionHeader {
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+  padding-left: $spacing-sm;
+}
+
+.channelHeader {
+  display: flex;
+  align-items: center;
+  position: relative;
+  padding-left: 40px;
+}
+
+.regionName {
+  font-weight: $font-semibold;
+  color: $gray-900;
+  font-size: $text-sm;
+}
+
+.channelName {
+  color: $gray-700;
+  font-size: $text-sm;
+}
+
+.expandIcon {
+  width: 12px;
+  height: 12px;
+  color: $gray-600;
+  transition: transform $transition-fast;
+  flex-shrink: 0;
+  
+  &.expanded {
+    transform: rotate(180deg);
+  }
+}
+
+// Tree branch lines
+.treeLines {
+  position: absolute;
+  left: 16px;
+  top: 0;
+  bottom: 0;
+  width: 20px;
+  height: 100%;
+}
+
+.verticalLine {
+  position: absolute;
+  left: 0;
+  top: -50%;
+  bottom: 50%;
+  width: 1px;
+  background-color: #d1d5db;
+}
+
+.horizontalLine {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 12px;
+  height: 1px;
+  background-color: #d1d5db;
+}
+
+.cornerLine {
+  position: absolute;
+  left: 0;
+  top: -50%;
+  bottom: 50%;
+  width: 1px;
+  background-color: #d1d5db;
+  height: calc(50% + 1px);
 }
