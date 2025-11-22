@@ -1,0 +1,178 @@
+@import './variables.scss';
+
+.tableContainer {
+  background-color: $white;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-md;
+  overflow: hidden;
+
+  .tableWrapper {
+    overflow-x: auto;
+  }
+
+  table {
+    min-width: 100%;
+    border-collapse: collapse;
+
+    thead {
+      background-color: $gray-50;
+
+      tr {
+        th {
+          padding: $spacing-md $spacing-lg;
+          text-align: left;
+          font-size: $text-xs;
+          font-weight: $font-medium;
+          color: $gray-500;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+
+          .headerContent {
+            display: flex;
+            align-items: center;
+            gap: $spacing-sm;
+
+            &.sortable {
+              cursor: pointer;
+              user-select: none;
+
+              &:hover {
+                color: $gray-700;
+              }
+            }
+
+            svg {
+              width: 1rem;
+              height: 1rem;
+              flex-shrink: 0;
+
+              &.sortIcon {
+                color: $gray-400;
+              }
+
+              &.sortIconActive {
+                color: $primary-color;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    tbody {
+      background-color: $white;
+
+      tr {
+        border-top: 1px solid $gray-200;
+        transition: background-color $transition-fast;
+
+        &:hover {
+          background-color: $gray-50;
+        }
+
+        td {
+          padding: $spacing-md $spacing-lg;
+          white-space: nowrap;
+          font-size: $text-sm;
+          color: $gray-700;
+
+          &.channelCell {
+            font-weight: $font-medium;
+            color: $gray-900;
+          }
+
+          &.spendCell {
+            font-weight: $font-semibold;
+            color: #059669;
+          }
+
+          &.conversionsCell {
+            font-weight: $font-semibold;
+            color: #2563eb;
+          }
+
+          &.ctrCell {
+            color: #7c3aed;
+          }
+
+          &.cpaCell {
+            color: #ea580c;
+          }
+        }
+      }
+    }
+  }
+}
+
+// Virtualized table styles
+.virtualTableWrapper {
+  overflow: hidden;
+  border-radius: $radius-lg $radius-lg 0 0;
+}
+
+.virtualHeader {
+  display: flex;
+  background-color: $gray-50;
+  border-bottom: 1px solid $gray-200;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.virtualHeaderCell {
+  padding: $spacing-md $spacing-lg;
+  font-size: $text-xs;
+  font-weight: $font-medium;
+  color: $gray-500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  display: flex;
+  align-items: center;
+  border-right: 1px solid $gray-200;
+
+  &:last-child {
+    border-right: none;
+  }
+
+  &.sortable {
+    cursor: pointer;
+    user-select: none;
+
+    &:hover {
+      color: $gray-700;
+      background-color: $gray-100;
+    }
+  }
+
+  .headerContent {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+    width: 100%;
+  }
+}
+
+.virtualRow {
+  display: flex;
+  border-bottom: 1px solid $gray-200;
+  background-color: $white;
+  transition: background-color $transition-fast;
+
+  &:hover {
+    background-color: $gray-50;
+  }
+}
+
+.virtualCell {
+  padding: $spacing-md $spacing-lg;
+  font-size: $text-sm;
+  color: $gray-700;
+  border-right: 1px solid $gray-100;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  &:last-child {
+    border-right: none;
+  }
+}

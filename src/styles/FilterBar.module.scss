@@ -1,0 +1,99 @@
+@import './variables.scss';
+
+.filterContainer {
+  background-color: $white;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-md;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-lg;
+
+  .filterHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: $spacing-md;
+
+    h2 {
+      font-size: $text-lg;
+      font-weight: $font-semibold;
+      color: $gray-900;
+      margin: 0;
+    }
+
+    .resetButton {
+      font-size: $text-sm;
+      color: $primary-color;
+      font-weight: $font-medium;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: $spacing-xs $spacing-sm;
+      border-radius: $radius-md;
+      transition: all $transition-fast;
+
+      &:hover {
+        color: $primary-dark;
+        background-color: #eff6ff;
+      }
+    }
+  }
+
+  .filterContent {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-lg;
+  }
+
+  .filterSection {
+    h3 {
+      font-size: $text-sm;
+      font-weight: $font-medium;
+      color: $gray-700;
+      margin: 0 0 $spacing-md 0;
+    }
+
+    .filterButtons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: $spacing-sm;
+
+      button {
+        padding: $spacing-xs $spacing-md;
+        border-radius: $radius-full;
+        font-size: $text-sm;
+        font-weight: $font-medium;
+        border: none;
+        cursor: pointer;
+        transition: all $transition-fast;
+
+        &.channelButton {
+          background-color: $gray-100;
+          color: $gray-700;
+
+          &:hover {
+            background-color: $gray-200;
+          }
+
+          &.active {
+            background-color: $primary-color;
+            color: $white;
+          }
+        }
+
+        &.regionButton {
+          background-color: $gray-100;
+          color: $gray-700;
+
+          &:hover {
+            background-color: $gray-200;
+          }
+
+          &.active {
+            background-color: #059669;
+            color: $white;
+          }
+        }
+      }
+    }
+  }
+}

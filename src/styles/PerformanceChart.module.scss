@@ -1,0 +1,84 @@
+@import './variables.scss';
+
+.chartContainer {
+  background-color: $white;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-md;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-lg;
+
+  .chartTitle {
+    font-size: $text-lg;
+    font-weight: $font-semibold;
+    color: $gray-900;
+    margin: 0 0 $spacing-md 0;
+  }
+
+  .chartSection {
+    margin-bottom: $spacing-2xl;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    .sectionTitle {
+      font-size: $text-sm;
+      font-weight: $font-medium;
+      color: $gray-700;
+      margin: 0 0 $spacing-md 0;
+    }
+  }
+
+  .emptyState {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 16rem;
+    color: $gray-500;
+  }
+}
+
+.customTooltip {
+  background-color: $white;
+  padding: $spacing-md;
+  border: 1px solid $gray-200;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-lg;
+
+  .tooltipTitle {
+    font-weight: $font-semibold;
+    color: $gray-900;
+    margin: 0 0 $spacing-sm 0;
+  }
+
+  .tooltipContent {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xs;
+
+    p {
+      font-size: $text-sm;
+      margin: 0;
+
+      &.spend {
+        color: #059669;
+      }
+
+      &.conversions {
+        color: #2563eb;
+      }
+
+      &.clicks {
+        color: #ea580c;
+      }
+
+      &.ctr {
+        color: #7c3aed;
+      }
+
+      span {
+        font-weight: $font-medium;
+      }
+    }
+  }
+}

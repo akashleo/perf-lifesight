@@ -1,0 +1,25 @@
+⚠️ IMPORTANT: Before running the app, please follow these steps:
+
+1. Create a 'public' folder in the root directory:
+   mkdir public
+
+2. Move the data file into the public folder:
+   move "1. marketing_dashboard_data.json" public/
+
+3. Install dependencies:
+   npm install
+
+4. Start the development server:
+   npm run dev
+
+The data file MUST be in the public/ directory for the app to load it correctly.
+
+After moving the file, your structure should look like:
+perf-lifesight/
+├── public/
+│   └── 1. marketing_dashboard_data.json  ← Data file here
+├── src/
+├── package.json
+└── ... other files
+
+See SETUP.md for detailed instructions.

@@ -1,0 +1,133 @@
+@import './variables.scss';
+
+.metricsGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: $spacing-lg;
+  margin-bottom: $spacing-lg;
+
+  @media (min-width: $breakpoint-md) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (min-width: $breakpoint-lg) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.metricCard {
+  background-color: $white;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-md;
+  padding: $spacing-lg;
+  transition: box-shadow $transition-base;
+
+  &:hover {
+    box-shadow: $shadow-lg;
+  }
+
+  .cardContent {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .cardText {
+    flex: 1;
+
+    .cardTitle {
+      font-size: $text-sm;
+      font-weight: $font-medium;
+      color: $gray-600;
+      margin: 0 0 $spacing-xs 0;
+    }
+
+    .cardValue {
+      font-size: $text-2xl;
+      font-weight: $font-bold;
+      margin: 0;
+
+      &.green {
+        color: #059669;
+      }
+
+      &.blue {
+        color: #2563eb;
+      }
+
+      &.purple {
+        color: #7c3aed;
+      }
+
+      &.orange {
+        color: #ea580c;
+      }
+
+      &.indigo {
+        color: #4f46e5;
+      }
+
+      &.pink {
+        color: #db2777;
+      }
+    }
+  }
+
+  .cardIcon {
+    padding: $spacing-md;
+    border-radius: $radius-full;
+
+    svg {
+      width: 1.5rem;
+      height: 1.5rem;
+    }
+
+    &.green {
+      background-color: #d1fae5;
+
+      svg {
+        color: #059669;
+      }
+    }
+
+    &.blue {
+      background-color: #dbeafe;
+
+      svg {
+        color: #2563eb;
+      }
+    }
+
+    &.purple {
+      background-color: #ede9fe;
+
+      svg {
+        color: #7c3aed;
+      }
+    }
+
+    &.orange {
+      background-color: #ffedd5;
+
+      svg {
+        color: #ea580c;
+      }
+    }
+
+    &.indigo {
+      background-color: #e0e7ff;
+
+      svg {
+        color: #4f46e5;
+      }
+    }
+
+    &.pink {
+      background-color: #fce7f3;
+
+      svg {
+        color: #db2777;
+      }
+    }
+  }
+}
